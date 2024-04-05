@@ -1,0 +1,53 @@
+.container {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    width: 50%;
+
+    margin-bottom: 20px;
+}
+
+.out {
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    flex-wrap: wrap;
+    column-gap: 3px;
+
+    width: 50%;
+    height: 100px;
+
+    padding: 5px;
+
+    font-size: 25px;
+
+    color: gray;
+
+    border: 2px dashed gray;
+
+    overflow-y: scroll;
+
+}
+
+p {
+    width: fit-content;
+    height: fit-content;
+
+    margin: 0;
+}

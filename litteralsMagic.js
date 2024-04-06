@@ -5,6 +5,9 @@ const elements = {
     container: document.querySelector('.container'),
     selectedRec: () => {if(document.querySelector('#selRec')) return document.querySelector('#selRec')},
     litterals: [],
+    litteralsTemp: [],
+    transElLink: '',
+    moveLitteral: '',
     startX: 0,
     startY: 0,
     currentX: 0,
@@ -123,7 +126,6 @@ const selectedField = (evt) => {
 
     };
 
-
     // selected litterals using the cursor slid rectangle
     // .onePointY of litteral *---  
     //                        |   |
@@ -143,6 +145,34 @@ const selectedField = (evt) => {
 
 };
 
+const transLitteral = (evt) => {
+
+    const transEl = document.querySelector(`#${elements.moveLitteral}`);
+
+    if(!elements.litteralsTemp.find(element => element.id === transEl.id)) {
+
+        elements.litteralsTemp.push(elements.litterals.find(element => element.id === elements.moveLitteral));
+        elements.litterals = elements.litterals.filter(element => element.id !== elements.moveLitteral);
+        transEl.remove();
+
+        let freeLitteral = elements.litteralsTemp.find(element => element.id === elements.moveLitteral);
+        elements.container.insertAdjacentHTML('beforeEnd', `<p id=${freeLitteral.id}>${freeLitteral.value}</p>`);
+        
+        const newtransEl = document.querySelector(`#${elements.moveLitteral}`);
+
+        elements.transElLink = newtransEl;
+
+        newtransEl.style.position = 'absolute';
+        newtransEl.style.color = 'gray';
+        newtransEl.style.fontSize = '25px';
+    };
+
+    
+    elements.transElLink.style.left = `${evt.clientX}px`;
+    elements.transElLink.style.top = `${evt.clientY}px`;
+
+};
+
 const isTrueCounter = () => {
 
     let trueCounter = 0;
@@ -157,8 +187,6 @@ const isTrueCounter = () => {
 };
 
 elements.textOut.addEventListener('click', (evt) =>{
-
-    evt.preventDefault();
 
     if(evt.target.id !== 'out') {
 
@@ -191,18 +219,28 @@ elements.textOut.addEventListener('click', (evt) =>{
 
 elements.textOut.addEventListener('mousedown', (evt) => {
 
-    elements.startX = evt.clientX;  
-    elements.startY = evt.clientY;
+    // on litterals
+    if(evt.target.id !== 'out') {
+        elements.moveLitteral = evt.target.id;
+        elements.container.addEventListener('mousemove', transLitteral);
 
-    elements.container.insertAdjacentHTML('beforeEnd', '<div id=selRec width=0 height=0></div>' );
+    }else {
+        //for slide and select
+        elements.startX = evt.clientX;  
+        elements.startY = evt.clientY;
+    
+        elements.container.insertAdjacentHTML('beforeEnd', '<div id=selRec width=0 height=0></div>' );
+    
+        elements.selectedRec().style.border =  '1px dashed blue';
+        elements.selectedRec().style.position = 'absolute';
+    
+        elements.textOut.addEventListener('mousemove', selectedField);
 
-    elements.selectedRec().style.border =  '1px dashed blue';
-    elements.selectedRec().style.position = 'absolute';
+    };
 
-    elements.textOut.addEventListener('mousemove', selectedField);
 });
 
-elements.textOut.addEventListener('mouseup', () =>{
+elements.container.addEventListener('mouseup', () =>{
 
     elements.startX = 0;  
     elements.startY = 0;
@@ -211,7 +249,17 @@ elements.textOut.addEventListener('mouseup', () =>{
     elements.currentY = 0;
 
     elements.textOut.removeEventListener('mousemove', selectedField);
+    elements.container.removeEventListener('mousemove', transLitteral);
 
     if(elements.selectedRec()) elements.selectedRec().remove();
 
+    for(const l of elements.litterals) {
+        
+       if((elements.transElLink.offsetLeft < l.twoPointX && elements.transElLink.offsetLeft > l.onePointX) ||
+       (elements.transElLink.offsetLeft + elements.transElLink.offsetWidth < l.twoPointX && elements.transElLink.offsetLeft + elements.transElLink.offsetWidth > l.onePointX)) {
+        elements.transElLink.remove();
+       };
+       
+    };
+    
 });

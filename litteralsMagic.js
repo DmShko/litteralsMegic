@@ -54,7 +54,7 @@ elements.button.addEventListener('click', (evt) =>{
     // make litterals object array
     elements.litterals = elements.textIn.value.split('').map((element, index) => {
         
-        return {value: element, id: createId(element, index), status: false, onePointX: 0, onePointY: 0, twoPointX: 0, twoPointY: 0};
+        return {value: element, id: createId(element, index), status: false, onePointX: 0, onePointY: 0, twoPointX: 0, twoPointY: 0, position: index};
 
     });
    
@@ -145,6 +145,14 @@ const selectedField = (evt) => {
 
 };
 
+const refreshPosition = () => {
+
+    for(let p = 0; p < elements.litterals.length; p += 1) {
+        elements.litterals[p].position = p;
+    };
+
+};
+
 const transLitteral = (evt) => {
 
     const transEl = document.querySelector(`#${elements.moveLitteral}`);
@@ -153,6 +161,13 @@ const transLitteral = (evt) => {
 
         elements.litteralsTemp.push(elements.litterals.find(element => element.id === elements.moveLitteral));
         elements.litterals = elements.litterals.filter(element => element.id !== elements.moveLitteral);
+        
+        // reprint litterals on click button
+        printText(elements.litterals);
+
+        refreshPosition();
+        
+
         transEl.remove();
 
         let freeLitteral = elements.litteralsTemp.find(element => element.id === elements.moveLitteral);
@@ -164,12 +179,26 @@ const transLitteral = (evt) => {
 
         newtransEl.style.position = 'absolute';
         newtransEl.style.color = 'gray';
-        newtransEl.style.fontSize = '25px';
+        newtransEl.style.fontSize = '30px';
+        newtransEl.style.width = 'fit-content';
+        newtransEl.style.textAlign = 'center';
     };
 
-    
     elements.transElLink.style.left = `${evt.clientX}px`;
     elements.transElLink.style.top = `${evt.clientY}px`;
+
+    //highlight
+    for(const l of elements.litterals) {
+    
+        if(elements.transElLink.offsetLeft >= l.onePointX && elements.transElLink.offsetLeft + elements.transElLink.offsetWidth <= l.twoPointX) {
+
+            elements.transElLink.style.backgroundColor = 'green'; 
+
+        }else {
+            elements.transElLink.style.backgroundColor = 'orange';
+        };
+        
+    }
 
 };
 
@@ -255,9 +284,24 @@ elements.container.addEventListener('mouseup', () =>{
 
     for(const l of elements.litterals) {
         
-       if((elements.transElLink.offsetLeft < l.twoPointX && elements.transElLink.offsetLeft > l.onePointX) ||
-       (elements.transElLink.offsetLeft + elements.transElLink.offsetWidth < l.twoPointX && elements.transElLink.offsetLeft + elements.transElLink.offsetWidth > l.onePointX)) {
+       if(elements.transElLink.offsetLeft >= l.onePointX && elements.transElLink.offsetLeft + elements.transElLink.offsetWidth <= l.twoPointX) {
+        
+        // search free element
+        const backElement = elements.litteralsTemp.find(element => element.id = elements.transElLink.id);
+    
+        // rewrite position for new element of 'litterals' array
+        backElement.position = l.position;
+
         elements.transElLink.remove();
+
+        // insert back free element to 'litterals' array
+        elements.litterals.splice(l.position + 1, 0, backElement);
+
+        // delete free element from 'litteralsTemp' array
+        elements.litteralsTemp = elements.litteralsTemp.filter(element => element.id !== backElement.id);
+
+        printText(elements.litterals);
+  
        };
        
     };

@@ -30,14 +30,14 @@
     justify-content: center;
 
     flex-wrap: wrap;
-    column-gap: 3px;
+    column-gap: 20px;
 
     width: 50%;
     height: 100px;
 
     padding: 5px;
 
-    font-size: 25px;
+    font-size: 40px;
 
     color: gray;
 
@@ -48,8 +48,10 @@
 }
 
 p {
-    width: fit-content;
+    width: 20px;
     height: fit-content;
-
+    text-align: center;
     margin: 0;
+
+    border: 1px solid black;
 }
